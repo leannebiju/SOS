@@ -1,2 +1,5 @@
 js/firebaseConfig.js
 .vscode
+.firebaserc
+firebase.json
+.firebase 
