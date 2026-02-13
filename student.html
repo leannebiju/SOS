@@ -1,14 +1,125 @@
-<script>
-if (localStorage.getItem("userType") !== "student") {
-  window.location.href = "student-login.html";
-}
-</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Student Dashboard</title>
+</head>
+<body>
 
-<button onclick="logout()">Logout</button>
+    <script>
+        if (localStorage.getItem("userType") !== "student") {
+            window.location.href = "student-login.html";
+        }
 
-<script>
-function logout() {
-  localStorage.removeItem("userType");
-  window.location.href = "student-login.html";
-}
-</script>
+        function logout() {
+            localStorage.removeItem("userType");
+            window.location.href = "student-login.html";
+        }
+    </script>
+
+    <button onclick="logout()">Logout</button>
+
+    <h1>SOS: Student Help Desk</h1>
+
+    <div id="ticketFormSection">
+        <label>Name: <input type="text" id="studentName"></label><br>
+        <label>Team: <input type="text" id="teamName"></label><br>
+        
+        <p>Issues:</p>
+        <input type="checkbox" class="issue-tag" value="Frontend"> Frontend
+        <input type="checkbox" class="issue-tag" value="Backend"> Backend
+        <input type="checkbox" class="issue-tag" value="Database"> Database
+        <input type="checkbox" class="issue-tag" value="Hardware"> Hardware
+        <input type="checkbox" class="issue-tag" value="AI/ML"> AI/ML<br><br>
+
+        <textarea id="description" placeholder="Description"></textarea><br>
+        
+        <button id="submitTicketBtn">Submit SOS</button>
+    </div>
+
+    <div id="activeTicketSection" style="display: none;">
+        <p><strong>Status:</strong> <span id="statusLabel">Waiting</span></p>
+        <p>Team: <span id="displayTeam"></span></p>
+        <p>Tags: <span id="displayTags"></span></p>
+        <p>Issue: <span id="displayDesc"></span></p>
+        <button id="resolveBtn">Mark as Resolved</button>
+    </div>
+
+    <div id="successSection" style="display: none;">
+        <p>Resolved in: <span id="timeTakenLabel"></span></p>
+        <button onclick="location.reload()">New Ticket</button>
+    </div>
+
+    <script type="module">
+        import { db } from "./js/firebase.js";
+        import { ref, push, set, onValue, serverTimestamp, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        let currentTicketId = null;
+        let startTime = null;
+
+        document.getElementById("submitTicketBtn").addEventListener("click", async () => {
+            const name = document.getElementById("studentName").value.trim();
+            const team = document.getElementById("teamName").value.trim();
+            const desc = document.getElementById("description").value.trim();
+            const tags = Array.from(document.querySelectorAll('.issue-tag:checked')).map(cb => cb.value);
+
+            if(!name || !team || tags.length === 0) return alert("Fill all fields");
+
+            const newTicketRef = push(ref(db, 'tinkherhack/tickets'));
+            currentTicketId = newTicketRef.key;
+            startTime = Date.now();
+
+            await set(newTicketRef, {
+                studentName: name,
+                teamName: team,
+                description: desc,
+                tags: tags,
+                status: "Waiting",
+                createdAt: serverTimestamp()
+            });
+            
+            document.getElementById("ticketFormSection").style.display = "none";
+            document.getElementById("activeTicketSection").style.display = "block";
+            document.getElementById("displayTeam").innerText = team;
+            document.getElementById("displayTags").innerText = tags.join(", ");
+            document.getElementById("displayDesc").innerText = desc;
+
+            listenToTicketUpdates(currentTicketId);
+        });
+
+        // --- UPDATED LOGIC TO SHOW MENTOR NAME ---
+        function listenToTicketUpdates(id) {
+            onValue(ref(db, `tinkherhack/tickets/${id}`), (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    const statusSpan = document.getElementById("statusLabel");
+                    
+                    if (data.status === "In Progress" && data.acceptedBy) {
+                        statusSpan.innerText = `${data.acceptedBy} is coming to help you!`;
+                    } else {
+                        statusSpan.innerText = data.status;
+                        statusSpan.style.color = "black";
+                    }
+                }
+            });
+        }
+
+        document.getElementById("resolveBtn").addEventListener("click", async () => {
+            const diff = Date.now() - startTime;
+            const mins = Math.floor(diff / 60000);
+            const secs = ((diff % 60000) / 1000).toFixed(0);
+            const duration = `${mins}m ${secs}s`;
+
+            await update(ref(db, `tinkherhack/tickets/${currentTicketId}`), {
+                status: "Resolved",
+                resolvedAt: serverTimestamp(),
+                duration: duration
+            });
+
+            document.getElementById("activeTicketSection").style.display = "none";
+            document.getElementById("successSection").style.display = "block";
+            document.getElementById("timeTakenLabel").innerText = duration;
+        });
+    </script>
+</body>
+</html>
