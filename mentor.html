@@ -7,6 +7,19 @@
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
+
+<script>
+        if (localStorage.getItem("userType") !== "mentor") {
+            window.location.href = "mentor-login.html";
+        }
+
+        function logout() {
+            localStorage.removeItem("userType");
+            window.location.href = "mentor-login.html";
+        }
+    </script>
+
+
 <body class="mentor-body">
     <header class="app-header">
         <div class="header-left">
