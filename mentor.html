@@ -1,14 +1,239 @@
-<script>
-if (localStorage.getItem("userType") !== "mentor") {
-  window.location.href = "mentor-login.html";
-}
-</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Mentor Dashboard</title>
+    <style>
+        body {
+            display: flex;
+            gap: 20px;
+            margin: 0;
+            font-family: sans-serif;
+        }
 
-<button onclick="logout()">Logout</button>
+        #tagFilterSection {
+            width: 200px;
+            border-right: 1px solid #ccc;
+            padding: 10px;
+        }
 
-<script>
-function logout() {
-  localStorage.removeItem("userType");
-  window.location.href = "mentor-login.html";
-}
-</script>
+        #ticketList {
+            flex: 1;
+            padding: 10px;
+        }
+
+        .ticket {
+            border: 1px solid black;
+            padding: 10px;
+            margin: 10px 0;
+        }
+
+        .tag-button {
+            display: block;
+            margin: 5px 0;
+            cursor: pointer;
+        }
+
+        .tag-button.active {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #header {
+            position: fixed;
+            top: 0;
+            right: 0;
+            padding: 10px 20px;
+        }
+
+        #dashboardSection {
+            display: flex;
+            width: 100%;
+            margin-top: 50px;
+        }
+
+        #nameSetupSection {
+            padding: 20px;
+        }
+
+        #ticketStats {
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="header">
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div id="nameSetupSection">
+        <h2>Mentor Identity</h2>
+        <input type="text" id="mentorNameInput" placeholder="Enter your name">
+        <button id="saveNameBtn">Login</button>
+    </div>
+
+    <div id="dashboardSection" style="display: none;">
+        <div id="tagFilterSection">
+            <h3>Filter by Tags</h3>
+            <button class="tag-button" data-tag="Frontend">Frontend</button>
+            <button class="tag-button" data-tag="Backend">Backend</button>
+            <button class="tag-button" data-tag="Database">Database</button>
+            <button class="tag-button" data-tag="Hardware">Hardware</button>
+            <button class="tag-button" data-tag="AI/ML">AI/ML</button>
+            <button class="tag-button" data-tag="Other">Other</button>
+        </div>
+
+        <div style="flex:1;">
+            <h1>Mentor Dashboard</h1>
+            <p>Logged in as: <span id="displayName"></span></p>
+            <hr>
+            
+            <div id="ticketStats">
+                <p>Total Tickets Solved: <span id="solvedCount">0</span></p>
+                <p>Tickets In Progress: <span id="inProgressCount">0</span></p>
+                <p>New/Unaccepted Tickets: <span id="newCount">0</span></p>
+            </div>
+
+            <div id="ticketList">
+                <p>Checking for tickets...</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { db } from "./js/firebase.js";
+        import { ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+        const nameSetup = document.getElementById("nameSetupSection");
+        const dashboard = document.getElementById("dashboardSection");
+        const ticketList = document.getElementById("ticketList");
+        const tagFilterSection = document.getElementById("tagFilterSection");
+
+        let selectedTags = new Set();
+        let allTickets = {};
+
+        function logout() {
+            localStorage.removeItem("userType");
+            localStorage.removeItem("mentorName");
+            window.location.href = "mentor-login.html";
+        }
+        window.logout = logout;
+
+        function init() {
+            const savedName = localStorage.getItem("mentorName");
+            if (savedName) {
+                nameSetup.style.display = "none";
+                dashboard.style.display = "flex";
+                document.getElementById("displayName").innerText = savedName;
+                startListening();
+            }
+        }
+
+        document.getElementById("saveNameBtn").addEventListener("click", () => {
+            const name = document.getElementById("mentorNameInput").value.trim();
+            if (name) {
+                localStorage.setItem("mentorName", name);
+                init();
+            }
+        });
+
+        function startListening() {
+            const ticketsRef = ref(db, 'tinkherhack/tickets');
+            onValue(ticketsRef, (snapshot) => {
+                allTickets = snapshot.val() || {};
+                renderTickets();
+            });
+        }
+
+        function renderTickets() {
+            ticketList.innerHTML = "";
+
+            let ticketsArray = Object.keys(allTickets)
+                .map(id => ({ id, ...allTickets[id] }))
+                .filter(ticket => ticket.status !== "Resolved");
+
+            // Apply multi-tag filter
+            if (selectedTags.size > 0) {
+                ticketsArray = ticketsArray.filter(ticket =>
+                    ticket.tags && ticket.tags.some(tag => selectedTags.has(tag))
+                );
+            }
+
+            const solvedCount = Object.values(allTickets).filter(t => t.status === "Resolved").length;
+            const inProgressCount = Object.values(allTickets).filter(t => t.status === "In Progress").length;
+            const newCount = Object.values(allTickets).filter(t => !t.acceptedBy && t.status !== "Resolved").length;
+
+            document.getElementById("solvedCount").innerText = solvedCount;
+            document.getElementById("inProgressCount").innerText = inProgressCount;
+            document.getElementById("newCount").innerText = newCount;
+
+            ticketsArray.sort((a, b) => {
+                const aAccepted = a.acceptedBy ? 1 : 0;
+                const bAccepted = b.acceptedBy ? 1 : 0;
+                return aAccepted - bAccepted; 
+            });
+
+            if (ticketsArray.length === 0) {
+                ticketList.innerHTML = "<p>All caught up! No active tickets.</p>";
+                return;
+            }
+
+            ticketsArray.forEach(ticket => {
+                const div = document.createElement("div");
+                div.className = "ticket";
+
+                div.innerHTML = `
+                    <h3>Team: ${ticket.teamName || 'N/A'}</h3>
+                    <p><strong>Issue:</strong> ${ticket.description}</p>
+                    <p><strong>Tags:</strong> ${ticket.tags ? ticket.tags.join(", ") : "None"}</p>
+                    <p><strong>Status:</strong> ${ticket.status}</p>
+                    ${ticket.acceptedBy ? `<p>Mentor: ${ticket.acceptedBy}</p>` : ""}
+                `;
+
+                if (!ticket.acceptedBy) {
+                    const btn = document.createElement("button");
+                    btn.textContent = "Accept SOS";
+                    btn.addEventListener("click", () => acceptTicket(ticket.id));
+                    div.appendChild(btn);
+                }
+
+                ticketList.appendChild(div);
+            });
+        }
+
+        function acceptTicket(id) {
+            const mentor = localStorage.getItem("mentorName");
+            update(ref(db, `tinkherhack/tickets/${id}`), {
+                status: "In Progress",
+                acceptedBy: mentor
+            }).then(() => {
+                alert("You have accepted this ticket!");
+            }).catch(err => console.error(err));
+        }
+
+        function setupTagButtons() {
+            const buttons = Array.from(tagFilterSection.querySelectorAll(".tag-button"));
+
+            buttons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const tag = btn.getAttribute("data-tag");
+
+                    if (selectedTags.has(tag)) {
+                        selectedTags.delete(tag);
+                        btn.classList.remove("active");
+                    } else {
+                        selectedTags.add(tag);
+                        btn.classList.add("active");
+                    }
+
+                    renderTickets();
+                });
+            });
+        }
+
+        setupTagButtons();
+        init();
+    </script>
+</body>
+</html>
