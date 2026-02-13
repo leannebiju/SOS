@@ -2,75 +2,105 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Student Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Submit a Ticket | SOS</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
+    <header class="app-header">
+        <div class="header-left">
+            <span class="logo-icon">🚦</span>
+            <span class="logo-text">SOS: <strong>Mentor Connect</strong></span>
+        </div>
+        <div class="header-right">
+            <button class="logout-pill" onclick="logout()">Logout</button>
+        </div>
+    </header>
 
-    <script>
-        if (localStorage.getItem("userType") !== "student") {
-            window.location.href = "student-login.html";
-        }
+    <main class="hero-container">
+        <div class="hero-card dashboard-card">
+            <div id="ticketFormSection">
+                <h1 class="dashboard-title">Submit a Ticket</h1>
+                <p class="dashboard-subtitle">Describe your issue. We'll connect you with a mentor as soon as possible.</p>
 
-        function logout() {
-            localStorage.removeItem("userType");
-            window.location.href = "student-login.html";
-        }
-    </script>
+                <div class="form-body-single">
+                    <div class="input-block">
+                        <label>Enter your team name</label>
+                        <input type="text" id="teamName" placeholder="Enter your team name">
+                    </div>
 
-    <button onclick="logout()">Logout</button>
+                    <div class="input-block">
+                        <label>Relevant Tags</label>
+                        <div class="checkbox-grid-aligned">
+                            <label><input type="checkbox" class="issue-tag" value="Frontend"> Frontend</label>
+                            <label><input type="checkbox" class="issue-tag" value="Backend"> Backend</label>
+                            <label><input type="checkbox" class="issue-tag" value="AI/ML"> AI/ML</label>
+                            <label><input type="checkbox" class="issue-tag" value="Hardware"> Hardware</label>
+                            <label><input type="checkbox" class="issue-tag" value="Database"> Database</label>
+                            <label><input type="checkbox" class="issue-tag" value="Other"> Other</label>
+                        </div>
+                    </div>
 
-    <h1>SOS: Student Help Desk</h1>
+                    <div class="input-block">
+                        <label>Problem Description</label>
+                        <textarea id="description" placeholder="Describe the issue you're facing..."></textarea>
+                    </div>
 
-    <div id="ticketFormSection">
-        <label>Name: <input type="text" id="studentName"></label><br>
-        <label>Team: <input type="text" id="teamName"></label><br>
-        
-        <p>Issues:</p>
-        <input type="checkbox" class="issue-tag" value="Frontend"> Frontend
-        <input type="checkbox" class="issue-tag" value="Backend"> Backend
-        <input type="checkbox" class="issue-tag" value="Database"> Database
-        <input type="checkbox" class="issue-tag" value="Hardware"> Hardware
-        <input type="checkbox" class="issue-tag" value="AI/ML"> AI/ML<br><br>
+                    <button class="btn-submit-ticket" id="submitTicketBtn">Submit Ticket</button>
+                </div>
+            </div>
 
-        <textarea id="description" placeholder="Description"></textarea><br>
-        
-        <button id="submitTicketBtn">Submit SOS</button>
-    </div>
+            <div id="activeTicketSection" style="display: none;">
+                <h1 class="dashboard-title">Ticket Status</h1>
+                <div class="status-box" style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0;">
+                    <h2 id="statusLabel" style="color: #ff6b6b;">Waiting...</h2>
+                    <p><strong>Team:</strong> <span id="displayTeam"></span></p>
+                    <p><strong>Tags:</strong> <span id="displayTags"></span></p>
+                    <p><strong>Description:</strong> <span id="displayDesc"></span></p>
+                </div>
+                <button class="btn-submit-ticket" id="resolveBtn" style="background: #51cf66;">Mark as Resolved</button>
+            </div>
 
-    <div id="activeTicketSection" style="display: none;">
-        <p><strong>Status:</strong> <span id="statusLabel">Waiting</span></p>
-        <p>Team: <span id="displayTeam"></span></p>
-        <p>Tags: <span id="displayTags"></span></p>
-        <p>Issue: <span id="displayDesc"></span></p>
-        <button id="resolveBtn">Mark as Resolved</button>
-    </div>
-
-    <div id="successSection" style="display: none;">
-        <p>Resolved in: <span id="timeTakenLabel"></span></p>
-        <button onclick="location.reload()">New Ticket</button>
-    </div>
+            <div id="successSection" style="display: none; text-align: center;">
+                <h1 class="dashboard-title">Issue Resolved! ✅</h1>
+                <p>Time taken: <span id="timeTakenLabel"></span></p>
+                <button class="btn-submit-ticket" onclick="location.reload()">New Ticket</button>
+            </div>
+        </div>
+    </main>
 
     <script type="module">
         import { db } from "./js/firebase.js";
         import { ref, push, set, onValue, serverTimestamp, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
+        // Security Check
+        if (localStorage.getItem("userType") !== "student") {
+            window.location.href = "student-login.html";
+        }
+
+        // Global Logout
+        window.logout = function() {
+            localStorage.removeItem("userType");
+            window.location.href = "student-login.html";
+        };
+
         let currentTicketId = null;
         let startTime = null;
 
+        // --- FIXED SUBMIT LOGIC ---
         document.getElementById("submitTicketBtn").addEventListener("click", async () => {
-            const name = document.getElementById("studentName").value.trim();
             const team = document.getElementById("teamName").value.trim();
             const desc = document.getElementById("description").value.trim();
             const tags = Array.from(document.querySelectorAll('.issue-tag:checked')).map(cb => cb.value);
 
-            if(!name || !team || tags.length === 0) return alert("Fill all fields");
+            if(!team || tags.length === 0) return alert("Please fill in your team name and select at least one tag.");
 
             const newTicketRef = push(ref(db, 'tinkherhack/tickets'));
             currentTicketId = newTicketRef.key;
             startTime = Date.now();
 
             await set(newTicketRef, {
-                studentName: name,
                 teamName: team,
                 description: desc,
                 tags: tags,
@@ -78,6 +108,7 @@
                 createdAt: serverTimestamp()
             });
             
+            // UI Switch
             document.getElementById("ticketFormSection").style.display = "none";
             document.getElementById("activeTicketSection").style.display = "block";
             document.getElementById("displayTeam").innerText = team;
@@ -87,23 +118,23 @@
             listenToTicketUpdates(currentTicketId);
         });
 
-        // --- UPDATED LOGIC TO SHOW MENTOR NAME ---
         function listenToTicketUpdates(id) {
             onValue(ref(db, `tinkherhack/tickets/${id}`), (snapshot) => {
                 const data = snapshot.val();
                 if (data) {
                     const statusSpan = document.getElementById("statusLabel");
-                    
                     if (data.status === "In Progress" && data.acceptedBy) {
                         statusSpan.innerText = `${data.acceptedBy} is coming to help you!`;
+                        statusSpan.style.color = "#feca57";
                     } else {
                         statusSpan.innerText = data.status;
-                        statusSpan.style.color = "black";
+                        statusSpan.style.color = data.status === "Waiting" ? "#ff6b6b" : "#51cf66";
                     }
                 }
             });
         }
 
+        // Resolve Logic
         document.getElementById("resolveBtn").addEventListener("click", async () => {
             const diff = Date.now() - startTime;
             const mins = Math.floor(diff / 60000);
