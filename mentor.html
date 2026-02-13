@@ -16,7 +16,7 @@
         <div class="header-right">
             <div id="userInfo" style="display: none; align-items: center; gap: 12px;">
                 <span class="user-greeting">Hello, <strong id="displayName">Mentor</strong>!</span>
-                <div class="header-avatar"></div>
+                
                 <button class="logout-pill" onclick="logout()">Logout</button>
             </div>
         </div>
@@ -148,7 +148,7 @@
             activeTickets.sort((a, b) => (a.status === "Waiting" ? -1 : 1));
 
             if (activeTickets.length === 0) {
-                ticketList.innerHTML = `<div class="empty-state">🎉 All caught up! No active tickets.</div>`;
+                ticketList.innerHTML = `<div class="empty-state">All caught up! No active tickets.</div>`;
                 return;
             }
 
