@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Mentor Login</title>
+</head>
+<body>
+
+<h2>Mentor Login</h2>
+
+<input type="password" id="codeInput" placeholder="Enter Code">
+<button id="loginBtn">Login</button>
+
+<script type="module">
+
+import { db } from "./js/firebase.js";
+import { ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+document.getElementById("loginBtn").addEventListener("click", async function() {
+
+  const enteredCode = document.getElementById("codeInput").value.trim();
+
+  const snapshot = await get(ref(db, "tinkherhack/accessCodes/mentorCode"));
+
+  if (snapshot.exists()) {
+    const correctCode = snapshot.val();
+
+    if (enteredCode === correctCode) {
+      localStorage.setItem("userType", "mentor");
+      window.location.href = "mentor.html";
+    } else {
+      alert("Invalid Code");
+    }
+  } else {
+    alert("Code not found in database");
+  }
+
+});
+
+
+</script>
+
+
+</body>
+</html>
