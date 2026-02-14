@@ -7,7 +7,7 @@ SOS: Mentor Connect is a dual-interface dashboard designed to bridge the gap bet
 
 ## Project URL
 
-![Click Here to see the Deployed Site!](https://tinker-8fe52.web.app/)
+[Click Here to see the Deployed Site!](https://tinker-8fe52.web.app/)
 ---
 
 ## Tech Stack
