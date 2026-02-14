@@ -8,6 +8,7 @@
 <link rel="icon" type="image/png" href="favicon.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
+
     .btn-link {
         color: #fff;
         border: none;
@@ -47,6 +48,7 @@ function logout() {
         <span class="logo-icon">🚦</span>
         <span class="logo-text">SOS: <strong>Mentor Connect</strong></span>
     </div>
+    <!--  header -->
     <div class="header-right">
         <div id="userInfo" style="display: none; align-items: center; gap: 12px;">
             <span class="user-greeting">Hello, <strong id="displayName">Mentor</strong>!</span>
@@ -54,7 +56,7 @@ function logout() {
         </div>
     </div>
 </header>
-
+<!-- input a name -->
 <main class="hero-container">
     <div id="nameSetupSection" class="hero-card dashboard-card" style="max-width: 400px; margin: auto; text-align: center;">
         <h1 class="dashboard-title">Mentor Identity</h1>
@@ -64,7 +66,7 @@ function logout() {
         </div>
         <button class="btn-submit-ticket" id="saveNameBtn">Enter Dashboard</button>
     </div>
-
+<!-- display of the tickets -->
     <div id="dashboardSection" style="display: none; width: 100%; max-width: 900px; margin: auto; padding: 20px;">
         <h1 class="dashboard-title">Active Tickets</h1>
 
@@ -102,7 +104,7 @@ function logout() {
         </div>
     </div>
 </main>
-
+<!-- retrieving from database -->
 <script type="module">
 import { db } from "./js/firebase.js";
 import { ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
@@ -152,7 +154,7 @@ document.getElementById("saveNameBtn").addEventListener("click", () => {
         init();
     }
 });
-
+/* updation of time */
 function timeAgo(timestamp) {
     if (!timestamp) return "...";
     const seconds = Math.floor((Date.now() - timestamp) / 1000);
@@ -167,7 +169,7 @@ function startListening() {
         renderTickets();
     });
 }
-
+/* real time computation of no of tickets */
 function renderTickets() {
     ticketList.innerHTML = "";
     let ticketsArray = Object.keys(allTickets).map(id => ({ id, ...allTickets[id] }));
@@ -204,13 +206,13 @@ function renderTickets() {
                 <div class="ticket-tags-row">
                     ${ticket.tags ? ticket.tags.map(t => `<span class="mini-tag">${t}</span>`).join('') : ''}
                 </div>
-
+/* open github url */
                 ${ticket.githubLink ? `
                     <div class="ticket-github-row">
                         <button class="btn-link btn-github" onclick="window.open('${ticket.githubLink}','_blank')">Open GitHub Repo</button>
                     </div>
                 ` : ''}
-
+/* open gmeet url */
                 ${ticket.googleMeetLink ? `
                     <div class="ticket-github-row">
                         <button class="btn-link btn-meet" onclick="window.open('${ticket.googleMeetLink}','_blank')">Join Google Meet</button>
@@ -233,7 +235,7 @@ function renderTickets() {
         ticketList.appendChild(card);
     });
 }
-
+/* remove completed tickets */
 tagFilterSection.querySelectorAll(".tag-pill").forEach(btn => {
     btn.onclick = () => {
         const tag = btn.dataset.tag;
