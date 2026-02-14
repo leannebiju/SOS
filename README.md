@@ -26,7 +26,7 @@ SOS: Mentor Connect is a dual-interface dashboard designed to bridge the gap bet
 ## Installation - Web App
 
 1. Clone the repository
-`git clone https://github.com/your-username/sos-mentor-connect.git`
+`git clone https://github.com/leannebiju/SOS.git`
 2. Navigate to the project directory
 3. Configure the Firebase
 4. Open index.html in your browser or start Live Server
@@ -35,8 +35,11 @@ SOS: Mentor Connect is a dual-interface dashboard designed to bridge the gap bet
 
 ## Deployment
 `npm install -g firebase-tools`
+<br>
 `firebase login`
+<br>
 `firebase init`
+<br>
 `firebase deploy`
 
 ---
