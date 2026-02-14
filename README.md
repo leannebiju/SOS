@@ -34,10 +34,10 @@ SOS: Mentor Connect is a dual-interface dashboard designed to bridge the gap bet
 ---
 
 ## Deployment
-`npm install -g firebase-tools
-firebase login
-firebase init
-firebase deploy`
+`npm install -g firebase-tools`
+`firebase login`
+`firebase init`
+`firebase deploy`
 
 ---
 
@@ -71,15 +71,23 @@ The application utilizes a hierarchical NoSQL structure under a root node tinkhe
 ## Screenshots
 
 ![Home Page](docs/index.jpeg)
+
 ![Student Login](docs/stu_log.jpeg)
+
 ![Student Page](docs/submit_ticket.jpeg)
+
 ![Student Waiting Page](docs/ticket_waiting.jpeg)
+
 ![Student Ticket Accepted by Mentor](docs/stu_ticket_accepted.jpeg)
+
 ![Mentor Login](docs/mentor_login/.jpeg)
+
 ![Mentor Identity](docs/mentor_identity.jpeg)
+
 ![Mentor Page](docs/mentor_page.jpeg)
 
 ---
+
 ## Team Members
 
 1. [Hannah Achu John](https://github.com/Hannah-Achu) - FrontEnd
