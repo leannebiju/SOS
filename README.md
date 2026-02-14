@@ -70,8 +70,10 @@ The application utilizes a hierarchical NoSQL structure under a root node tinkhe
 
 ## Screenshots
 
+### Home Page
 ![Home Page](docs/index.jpeg)
 
+### Student Login
 ![Student Login](docs/stu_log.jpeg)
 
 ![Student Page](docs/submit_ticket.jpeg)
