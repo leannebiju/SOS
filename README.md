@@ -76,16 +76,22 @@ The application utilizes a hierarchical NoSQL structure under a root node tinkhe
 ### Student Login
 ![Student Login](docs/stu_log.jpeg)
 
+### Student Page
 ![Student Page](docs/submit_ticket.jpeg)
 
+### Student Waiting
 ![Student Waiting Page](docs/ticket_waiting.jpeg)
 
+### Student Ticket Accepted
 ![Student Ticket Accepted by Mentor](docs/stu_ticket_accepted.jpeg)
 
+### Mentor Login
 ![Mentor Login](docs/mentor_login/.jpeg)
 
+### Mentor Identity
 ![Mentor Identity](docs/mentor_identity.jpeg)
 
+### Mentor Page
 ![Mentor Page](docs/mentor_page.jpeg)
 
 ---
