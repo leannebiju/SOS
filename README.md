@@ -8,6 +8,7 @@ SOS: Mentor Connect is a dual-interface dashboard designed to bridge the gap bet
 ## Project URL
 
 [Click Here to see the Deployed Site!](https://tinker-8fe52.web.app/)
+Please Note : The access code for Student login is `student` and for Mentor login is `mentor`
 ---
 
 ## Tech Stack
