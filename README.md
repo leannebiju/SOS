@@ -99,7 +99,7 @@ The application utilizes a hierarchical NoSQL structure under a root node tinkhe
 ## Team Members
 
 1. [Hannah Achu John](https://github.com/Hannah-Achu) - FrontEnd
-2. [Leanne](https://github.com/leannebiju) - Firebase Integration
+2. [Leanne Roslyn Biju](https://github.com/leannebiju) - Firebase Integration
 
 --- 
 
