@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
 </head>
 <body>
+   <!--  header -->
   <header class="app-header">
         <div class="header-left">
             <span class="logo-icon">🚦</span>
@@ -30,7 +31,7 @@
             <p class="hero-description">
                 Enter the mentor code to log in.
             </p>
-
+<!-- authentication of mentor code --> 
             <div class="login-form">
                 <div class="input-group">
                     <input type="password" id="codeInput" placeholder="Enter Code">
@@ -51,7 +52,7 @@
     async function handleLogin() {
         const enteredCode = document.getElementById("codeInput").value.trim();
         
-        // Reset UI
+        
         errorDisplay.classList.add("hidden");
         errorDisplay.textContent = "";
 
