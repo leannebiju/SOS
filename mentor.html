@@ -1,221 +1,254 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mentor Dashboard | SOS</title>
-    <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentor Dashboard | SOS</title>
+<link rel="stylesheet" href="style.css">
+<link rel="icon" type="image/png" href="favicon.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+    .btn-link {
+        color: #fff;
+        border: none;
+        padding: 8px 14px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s ease-in-out;
+        text-decoration: none;
+        margin-right: 8px;
+    }
+    .btn-github { background-color: #24292e; }
+    .btn-github:hover { background-color: #444c56; transform: scale(1.05); }
+
+    .btn-meet { background-color: #0f9d58; }
+    .btn-meet:hover { background-color: #34a853; transform: scale(1.05); }
+
+    .ticket-github-row { margin-top: 8px; }
+</style>
 </head>
 
 <script>
-        if (localStorage.getItem("userType") !== "mentor") {
-            window.location.href = "mentor-login.html";
-        }
+if (localStorage.getItem("userType") !== "mentor") {
+    window.location.href = "mentor-login.html";
+}
 
-        function logout() {
-            localStorage.removeItem("userType");
-            window.location.href = "mentor-login.html";
-        }
-    </script>
-
+function logout() {
+    localStorage.removeItem("userType");
+    localStorage.removeItem("mentorName");
+    window.location.href = "mentor-login.html";
+}
+</script>
 
 <body class="mentor-body">
-    <header class="app-header">
-        <div class="header-left">
-            <span class="logo-icon">🚦</span>
-            <span class="logo-text">SOS: <strong>Mentor Connect</strong></span>
+<header class="app-header">
+    <div class="header-left">
+        <span class="logo-icon">🚦</span>
+        <span class="logo-text">SOS: <strong>Mentor Connect</strong></span>
+    </div>
+    <div class="header-right">
+        <div id="userInfo" style="display: none; align-items: center; gap: 12px;">
+            <span class="user-greeting">Hello, <strong id="displayName">Mentor</strong>!</span>
+            <button class="logout-pill" onclick="logout()">Logout</button>
         </div>
-        <div class="header-right">
-            <div id="userInfo" style="display: none; align-items: center; gap: 12px;">
-                <span class="user-greeting">Hello, <strong id="displayName">Mentor</strong>!</span>
-                
-                <button class="logout-pill" onclick="logout()">Logout</button>
+    </div>
+</header>
+
+<main class="hero-container">
+    <div id="nameSetupSection" class="hero-card dashboard-card" style="max-width: 400px; margin: auto; text-align: center;">
+        <h1 class="dashboard-title">Mentor Identity</h1>
+        <p class="dashboard-subtitle">Enter your name to start assisting teams.</p>
+        <div class="input-block">
+            <input type="text" id="mentorNameInput" placeholder="e.g. Joel Miller" style="text-align: center;">
+        </div>
+        <button class="btn-submit-ticket" id="saveNameBtn">Enter Dashboard</button>
+    </div>
+
+    <div id="dashboardSection" style="display: none; width: 100%; max-width: 900px; margin: auto; padding: 20px;">
+        <h1 class="dashboard-title">Active Tickets</h1>
+
+        <div class="filter-bar">
+            <span class="filter-label">Filter by Tags:</span>
+            <div id="tagFilterSection" class="tag-pills">
+                <button class="tag-pill" data-tag="Frontend">Frontend</button>
+                <button class="tag-pill" data-tag="Backend">Backend</button>
+                <button class="tag-pill" data-tag="AI/ML">AI/ML</button>
+                <button class="tag-pill" data-tag="Database">Database</button>
+                <button class="tag-pill" data-tag="Hardware">Hardware</button>
             </div>
         </div>
-    </header>
 
-    <main class="hero-container">
-        <div id="nameSetupSection" class="hero-card dashboard-card" style="max-width: 400px; margin: auto; text-align: center;">
-            <h1 class="dashboard-title">Mentor Identity</h1>
-            <p class="dashboard-subtitle">Enter your name to start assisting teams.</p>
-            <div class="input-block">
-                <input type="text" id="mentorNameInput" placeholder="e.g. Joel Miller" style="text-align: center;">
-            </div>
-            <button class="btn-submit-ticket" id="saveNameBtn">Enter Dashboard</button>
-        </div>
-
-        <div id="dashboardSection" style="display: none; width: 100%; max-width: 900px; margin: auto; padding: 20px;">
-            <h1 class="dashboard-title">Active Tickets</h1>
-            
-            <div class="filter-bar">
-                <span class="filter-label">Filter by Tags:</span>
-                <div id="tagFilterSection" class="tag-pills">
-                    <button class="tag-pill" data-tag="Frontend">Frontend</button>
-                    <button class="tag-pill" data-tag="Backend">Backend</button>
-                    <button class="tag-pill" data-tag="AI/ML">AI/ML</button>
-                    <button class="tag-pill" data-tag="Database">Database</button>
-                    <button class="tag-pill" data-tag="Hardware">Hardware</button>
+        <div class="overall-stats-card">
+            <h3 class="stats-header">Overall Stats</h3>
+            <div class="stats-container">
+                <div class="stat-card border-red">
+                    <span class="stat-value" id="newCount">0</span>
+                    <span class="stat-label">New Tickets</span>
+                </div>
+                <div class="stat-card border-yellow">
+                    <span class="stat-value" id="inProgressCount">0</span>
+                    <span class="stat-label">In Progress</span>
+                </div>
+                <div class="stat-card border-green">
+                    <span class="stat-value" id="solvedCount">0</span>
+                    <span class="stat-label">Resolved</span>
                 </div>
             </div>
-
-            <div class="overall-stats-card">
-                <h3 class="stats-header">Overall Stats</h3>
-                <div class="stats-container">
-                    <div class="stat-card border-red">
-                        <span class="stat-value" id="newCount">0</span>
-                        <span class="stat-label">New Tickets</span>
-                    </div>
-                    <div class="stat-card border-yellow">
-                        <span class="stat-value" id="inProgressCount">0</span>
-                        <span class="stat-label">In Progress</span>
-                    </div>
-                    <div class="stat-card border-green">
-                        <span class="stat-value" id="solvedCount">0</span>
-                        <span class="stat-label">Resolved</span>
-                    </div>
-                </div>
-            </div>
-
-            <div id="ticketList" class="ticket-grid">
-                <p class="loading-text">Scanning for SOS signals...</p>
-            </div>
         </div>
-    </main>
 
-    <script type="module">
-        import { db } from "./js/firebase.js";
-        import { ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+        <div id="ticketList" class="ticket-grid">
+            <p class="loading-text">Scanning for SOS signals...</p>
+        </div>
+    </div>
+</main>
 
-        const nameSetup = document.getElementById("nameSetupSection");
-        const dashboard = document.getElementById("dashboardSection");
-        const userInfo = document.getElementById("userInfo");
-        const ticketList = document.getElementById("ticketList");
-        const tagFilterSection = document.getElementById("tagFilterSection");
+<script type="module">
+import { db } from "./js/firebase.js";
+import { ref, onValue, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-        let selectedTags = new Set();
-        let allTickets = {};
+const nameSetup = document.getElementById("nameSetupSection");
+const dashboard = document.getElementById("dashboardSection");
+const userInfo = document.getElementById("userInfo");
+const ticketList = document.getElementById("ticketList");
+const tagFilterSection = document.getElementById("tagFilterSection");
 
-        // --- GLOBAL FUNCTIONS (Needed for HTML onclick) ---
-        window.logout = function() {
-            localStorage.removeItem("mentorName");
-            location.reload();
+let selectedTags = new Set();
+let allTickets = {};
+
+window.logout = function() {
+            localStorage.removeItem("userType");
+                localStorage.removeItem("mentorName");
+            window.location.href = "index.html";
         };
 
-        window.acceptTicket = async function(id) {
-            const mentor = localStorage.getItem("mentorName");
-            if (!mentor) return;
-            try {
-                await update(ref(db, `tinkherhack/tickets/${id}`), {
-                    status: "In Progress",
-                    acceptedBy: mentor
-                });
-            } catch (err) { 
-                console.error("Accept Error:", err); 
-            }
-        };
 
-        // --- DASHBOARD LOGIC ---
-        function init() {
-            const savedName = localStorage.getItem("mentorName");
-            if (savedName) {
-                nameSetup.style.display = "none";
-                dashboard.style.display = "block";
-                userInfo.style.display = "flex";
-                document.getElementById("displayName").innerText = savedName;
-                startListening();
-            }
-        }
-
-        document.getElementById("saveNameBtn").addEventListener("click", () => {
-            const name = document.getElementById("mentorNameInput").value.trim();
-            if (name) {
-                localStorage.setItem("mentorName", name);
-                init();
-            }
+window.acceptTicket = async function(id) {
+    const mentor = localStorage.getItem("mentorName");
+    if (!mentor) return;
+    try {
+        await update(ref(db, `tinkherhack/tickets/${id}`), {
+            status: "In Progress",
+            acceptedBy: mentor
         });
+    } catch (err) { console.error("Accept Error:", err); }
+};
 
-        function startListening() {
-            onValue(ref(db, 'tinkherhack/tickets'), (snapshot) => {
-                allTickets = snapshot.val() || {};
-                renderTickets();
-            });
-        }
+function init() {
+    const savedName = localStorage.getItem("mentorName");
+    if (savedName) {
+        nameSetup.style.display = "none";
+        dashboard.style.display = "block";
+        userInfo.style.display = "flex";
+        document.getElementById("displayName").innerText = savedName;
+        startListening();
+    }
+}
 
-        function renderTickets() {
-            ticketList.innerHTML = "";
-            let ticketsArray = Object.keys(allTickets).map(id => ({ id, ...allTickets[id] }));
-
-            // Update Stats
-            document.getElementById("solvedCount").innerText = ticketsArray.filter(t => t.status === "Resolved").length;
-            document.getElementById("inProgressCount").innerText = ticketsArray.filter(t => t.status === "In Progress").length;
-            document.getElementById("newCount").innerText = ticketsArray.filter(t => t.status === "Waiting").length;
-
-            let activeTickets = ticketsArray.filter(t => t.status !== "Resolved");
-            
-            if (selectedTags.size > 0) {
-                activeTickets = activeTickets.filter(t => t.tags && t.tags.some(tag => selectedTags.has(tag)));
-            }
-
-            // Sort: Waiting (New) at the top
-            activeTickets.sort((a, b) => (a.status === "Waiting" ? -1 : 1));
-
-            if (activeTickets.length === 0) {
-                ticketList.innerHTML = `<div class="empty-state">All caught up! No active tickets.</div>`;
-                return;
-            }
-
-            activeTickets.forEach((ticket, index) => {
-                const card = document.createElement("div");
-                const statusBorder = ticket.status === "In Progress" ? 'border-yellow' : 'border-red';
-                
-                card.className = `ticket-card-styled ${statusBorder}`;
-                
-                card.innerHTML = `
-                    <div class="ticket-main-content">
-                        <div class="ticket-header-row">
-                            
-                           <b> <span class="time-meta">Team: ${ticket.teamName}</span></b>
-                        </div>
-                        <h3 class="ticket-description-text">${ticket.description}</h3>
-                        <div class="ticket-tags-row">
-                            ${ticket.tags ? ticket.tags.map(t => `<span class="mini-tag">${t}</span>`).join('') : ''}
-                        </div>
-                        
-                        ${ticket.acceptedBy ? `
-                            <div class="assigned-mentor-badge">
-                                <div class="mini-avatar"></div>
-                                <span>Assigned to: <strong>${ticket.acceptedBy}</strong></span>
-                            </div>
-                        ` : ''}
-                    </div>
-                    <div class="ticket-action-area">
-                        ${!ticket.acceptedBy ? 
-                            `<button class="btn-accept-ticket" onclick="acceptTicket('${ticket.id}')">Accept Ticket</button>` : 
-                            `<span class="in-progress-label">IN PROGRESS</span>`
-                        }
-                    </div>
-                `;
-                
-                ticketList.appendChild(card);
-            });
-        }
-
-        tagFilterSection.querySelectorAll(".tag-pill").forEach(btn => {
-            btn.onclick = () => {
-                const tag = btn.dataset.tag;
-                if (selectedTags.has(tag)) {
-                    selectedTags.delete(tag);
-                    btn.classList.remove("active");
-                } else {
-                    selectedTags.add(tag);
-                    btn.classList.add("active");
-                }
-                renderTickets();
-            };
-        });
-
+document.getElementById("saveNameBtn").addEventListener("click", () => {
+    const name = document.getElementById("mentorNameInput").value.trim();
+    if (name) {
+        localStorage.setItem("mentorName", name);
         init();
-    </script>
+    }
+});
+
+function timeAgo(timestamp) {
+    if (!timestamp) return "...";
+    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+    if (seconds < 60) return "Just now";
+    const minutes = Math.floor(seconds / 60);
+    return `${minutes}m ago`;
+}
+
+function startListening() {
+    onValue(ref(db, 'tinkherhack/tickets'), (snapshot) => {
+        allTickets = snapshot.val() || {};
+        renderTickets();
+    });
+}
+
+function renderTickets() {
+    ticketList.innerHTML = "";
+    let ticketsArray = Object.keys(allTickets).map(id => ({ id, ...allTickets[id] }));
+
+    document.getElementById("solvedCount").innerText = ticketsArray.filter(t => t.status === "Resolved").length;
+    document.getElementById("inProgressCount").innerText = ticketsArray.filter(t => t.status === "In Progress").length;
+    document.getElementById("newCount").innerText = ticketsArray.filter(t => t.status === "Waiting").length;
+
+    let activeTickets = ticketsArray.filter(t => t.status !== "Resolved");
+
+    if (selectedTags.size > 0) {
+        activeTickets = activeTickets.filter(t => t.tags && t.tags.some(tag => selectedTags.has(tag)));
+    }
+
+    activeTickets.sort((a, b) => (a.status === "Waiting" ? -1 : 1));
+
+    if (activeTickets.length === 0) {
+        ticketList.innerHTML = `<div class="empty-state">All caught up! No active tickets.</div>`;
+        return;
+    }
+
+    activeTickets.forEach((ticket) => {
+        const card = document.createElement("div");
+        const statusBorder = ticket.status === "In Progress" ? 'border-yellow' : 'border-red';
+        
+        card.className = `ticket-card-styled ${statusBorder}`;
+        card.innerHTML = `
+            <div class="ticket-main-content">
+                <div class="ticket-header-row" style="display:flex; justify-content:space-between;">
+                    <b>Team: ${ticket.teamName}</b>
+                    <span style="font-size: 0.8rem; color: #888;">${timeAgo(ticket.createdAt)}</span>
+                </div>
+                <h3 class="ticket-description-text">${ticket.description}</h3>
+                <div class="ticket-tags-row">
+                    ${ticket.tags ? ticket.tags.map(t => `<span class="mini-tag">${t}</span>`).join('') : ''}
+                </div>
+
+                ${ticket.githubLink ? `
+                    <div class="ticket-github-row">
+                        <button class="btn-link btn-github" onclick="window.open('${ticket.githubLink}','_blank')">Open GitHub Repo</button>
+                    </div>
+                ` : ''}
+
+                ${ticket.googleMeetLink ? `
+                    <div class="ticket-github-row">
+                        <button class="btn-link btn-meet" onclick="window.open('${ticket.googleMeetLink}','_blank')">Join Google Meet</button>
+                    </div>
+                ` : ''}
+
+                ${ticket.acceptedBy ? `
+                    <div class="assigned-mentor-badge">
+                        <span>Assigned to: <strong>${ticket.acceptedBy}</strong></span>
+                    </div>
+                ` : ''}
+            </div>
+            <div class="ticket-action-area">
+                ${!ticket.acceptedBy ? 
+                    `<button class="btn-accept-ticket" onclick="acceptTicket('${ticket.id}')">Accept Ticket</button>` : 
+                    `<span class="in-progress-label">IN PROGRESS</span>`
+                }
+            </div>
+        `;
+        ticketList.appendChild(card);
+    });
+}
+
+tagFilterSection.querySelectorAll(".tag-pill").forEach(btn => {
+    btn.onclick = () => {
+        const tag = btn.dataset.tag;
+        if (selectedTags.has(tag)) {
+            selectedTags.delete(tag);
+            btn.classList.remove("active");
+        } else {
+            selectedTags.add(tag);
+            btn.classList.add("active");
+        }
+        renderTickets();
+    };
+});
+
+init();
+</script>
 </body>
 </html>

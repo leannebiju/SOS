@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Submit a Ticket | SOS</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="favicon.png">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -20,6 +21,8 @@
 
     <main class="hero-container">
         <div class="hero-card dashboard-card">
+
+            <!-- Ticket Form Section -->
             <div id="ticketFormSection">
                 <h1 class="dashboard-title">Submit a Ticket</h1>
                 <p class="dashboard-subtitle">Describe your issue. We'll connect you with a mentor as soon as possible.</p>
@@ -47,10 +50,21 @@
                         <textarea id="description" placeholder="Describe the issue you're facing..."></textarea>
                     </div>
 
+                    <div class="input-block">
+                        <label>GitHub Repository Link (Optional)</label>
+                        <input type="url" id="githubLink" placeholder="https://github.com/username/project">
+                    </div>
+
+                    <div class="input-block">
+                        <label>Google Meet Link (Optional)</label>
+                        <input type="url" id="googleMeetLink" placeholder="https://meet.google.com/xxx-xxxx-xxx">
+                    </div>
+
                     <button class="btn-submit-ticket" id="submitTicketBtn">Submit Ticket</button>
                 </div>
             </div>
 
+            <!-- Active Ticket / Status Section -->
             <div id="activeTicketSection" style="display: none;">
                 <h1 class="dashboard-title">Ticket Status</h1>
                 <div class="status-box" style="background: #f8f9fa; padding: 20px; border-radius: 12px; margin: 20px 0;">
@@ -58,15 +72,20 @@
                     <p><strong>Team:</strong> <span id="displayTeam"></span></p>
                     <p><strong>Tags:</strong> <span id="displayTags"></span></p>
                     <p><strong>Description:</strong> <span id="displayDesc"></span></p>
+
+                    <!-- Buttons for GitHub / Google Meet -->
+                    <div id="studentLinkButtons" style="margin-top: 10px;"></div>
                 </div>
                 <button class="btn-submit-ticket" id="resolveBtn" style="background: #51cf66;">Mark as Resolved</button>
             </div>
 
+            <!-- Success Section -->
             <div id="successSection" style="display: none; text-align: center;">
                 <h1 class="dashboard-title">Issue Resolved! ✅</h1>
                 <p>Time taken: <span id="timeTakenLabel"></span></p>
                 <button class="btn-submit-ticket" onclick="location.reload()">New Ticket</button>
             </div>
+
         </div>
     </main>
 
@@ -74,25 +93,25 @@
         import { db } from "./js/firebase.js";
         import { ref, push, set, onValue, serverTimestamp, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-        // Security Check
         if (localStorage.getItem("userType") !== "student") {
             window.location.href = "student-login.html";
         }
 
-        // Global Logout
-        window.logout = function() {
+            window.logout = function() {
             localStorage.removeItem("userType");
-            window.location.href = "student-login.html";
+                localStorage.removeItem("student");
+            window.location.href = "index.html";
         };
 
         let currentTicketId = null;
         let startTime = null;
 
-        // --- FIXED SUBMIT LOGIC ---
-        document.getElementById("submitTicketBtn").addEventListener("click", async () => {
+            document.getElementById("submitTicketBtn").addEventListener("click", async () => {
             const team = document.getElementById("teamName").value.trim();
             const desc = document.getElementById("description").value.trim();
             const tags = Array.from(document.querySelectorAll('.issue-tag:checked')).map(cb => cb.value);
+            const githubLink = document.getElementById("githubLink").value.trim();
+            const googleMeetLink = document.getElementById("googleMeetLink").value.trim();
 
             if(!team || tags.length === 0) return alert("Please fill in your team name and select at least one tag.");
 
@@ -104,16 +123,30 @@
                 teamName: team,
                 description: desc,
                 tags: tags,
+                githubLink: githubLink || null,
+                googleMeetLink: googleMeetLink || null,
                 status: "Waiting",
                 createdAt: serverTimestamp()
             });
-            
-            // UI Switch
+
             document.getElementById("ticketFormSection").style.display = "none";
             document.getElementById("activeTicketSection").style.display = "block";
             document.getElementById("displayTeam").innerText = team;
             document.getElementById("displayTags").innerText = tags.join(", ");
             document.getElementById("displayDesc").innerText = desc;
+
+            const buttonsDiv = document.getElementById("studentLinkButtons");
+            buttonsDiv.innerHTML = "";
+
+            if (googleMeetLink) {
+                const meetBtn = document.createElement("button");
+                meetBtn.innerText = "Join Google Meet";
+                meetBtn.className = "btn-submit-ticket";
+                meetBtn.style.background = "#0f9d58";
+                meetBtn.style.marginRight = "8px";
+                meetBtn.onclick = () => window.open(googleMeetLink, "_blank");
+                buttonsDiv.appendChild(meetBtn);
+            }
 
             listenToTicketUpdates(currentTicketId);
         });
@@ -134,7 +167,6 @@
             });
         }
 
-        // Resolve Logic
         document.getElementById("resolveBtn").addEventListener("click", async () => {
             const diff = Date.now() - startTime;
             const mins = Math.floor(diff / 60000);
@@ -151,6 +183,7 @@
             document.getElementById("successSection").style.display = "block";
             document.getElementById("timeTakenLabel").innerText = duration;
         });
+
     </script>
 </body>
 </html>
