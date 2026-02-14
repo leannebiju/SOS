@@ -79,6 +79,10 @@ The application utilizes a hierarchical NoSQL structure under a root node tinkhe
    * createdAt : timestamp (ms) for calculating wait times and sorting.
 
 ---
+## Video Demo
+
+[Video Demo for Project](https://youtu.be/JlnFWQA0W5M)
+---
 
 ## Screenshots
 
