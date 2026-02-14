@@ -60,15 +60,43 @@ body.landing-bg {
 }
 
 /* 4. The White Box (Hero Card / Login Card) */
+/* 4. The White Box (Submit Ticket Card) */
+/* Optimized Hero Card for Visibility */
 .hero-card {
     background: var(--card-white);
-    padding: 60px 40px;
+    padding: 25px 40px;      /* Reduced vertical padding (top/bottom) */
     border-radius: 24px;
     box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    max-width: 500px;
-    width: 90%;
+    
+    /* --- WIDTH ADJUSTMENT --- */
+    width: 95%;              /* Uses more of the screen width */
+    max-width: 750px !important; /* Made wider so inputs can sit better */
+    margin: 20px auto;       /* Reduced top margin to pull card up */
+    
     border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+/* Reduce title spacing */
+.hero-card h1 {
+    font-size: 1.8rem;
+    margin-bottom: 5px;
+}
+
+.hero-description {
+    margin-bottom: 15px;      /* Reduced from 40px to save space */
+    font-size: 0.9rem;
+}
+
+/* Fix for the internal alignment of the Submit Ticket page */
+.hero-card h1 {
+    text-align: center; /* Keep the title centered */
+    margin-bottom: 10px;
+}
+
+.hero-card .hero-description {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 0.95rem;
 }
 
 .hero-header {
@@ -114,7 +142,7 @@ h2 {
 
 .login-form input {
     width: 90%;
-    padding: 25px 20px;  /* Taller input box */
+    padding: 20px 20px;  /* Taller input box */
     margin-bottom: 25px;
     border: 2px solid var(--input-border);
     border-radius: 16px;
@@ -579,14 +607,13 @@ textarea {
 }
 
 /* Mobile Responsiveness */
-@media (max-width: 480px) {
-    .hero-card {
-        padding: 40px 20px;
-    }
+/* Mobile Responsiveness */
+@media (max-width: 400px) {
+   
     .hero-buttons {
         flex-direction: column;
     }
     h1 {
-        font-size: 2rem;
+        font-size: 1.8rem;  /* Slightly smaller for mobile */
     }
 }
